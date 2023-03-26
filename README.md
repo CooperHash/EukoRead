@@ -1,6 +1,6 @@
 # read
 
-A new Flutter project.
+Discover a world of simplicity with EukoRead.
 
 ![](https://raw.githubusercontent.com/CooperHash/ImageBase/master/readapp-main-show.jpg?token=GHSAT0AAAAAABYZWSWHDBMJIPHBDLQI6LYSZBAHBRQ)
 
