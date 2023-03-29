@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'package:desktop_window/desktop_window.dart' as window_size;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'article.dart';
@@ -15,7 +15,10 @@ import 'dart:ui' as ui;
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  PlatformChannel.setWindowSizeToFraction(3 / 5, 1);
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    // window_size.DesktopWindow.setMinWindowSize(Size(375, 750));
+    window_size.DesktopWindow.setMaxWindowSize(Size(1200, 1200));
+  }
   runApp(ReadApp());
 }
 

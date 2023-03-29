@@ -46,6 +46,7 @@ class Article {
   }
 
   static Future<File> _writeArticles(List<Article> articles) async {
+    print('write articles');
     final file = await _localFile;
     final json =
         jsonEncode(articles.map((article) => article.toJson()).toList());
@@ -53,6 +54,7 @@ class Article {
   }
 
   static Future<List<Article>> getArticles() async {
+    print('get articles');
     final file = await _localFile;
     if (!file.existsSync()) {
       return [];
@@ -70,12 +72,13 @@ class Article {
   }
 
   static Future<Article> parseArticle(String url) async {
+    print('parseArticle $url');
     final unescape = HtmlUnescape();
     final uri = Uri.parse(url);
     final response = await http.get(Uri.parse(url));
     final document = parse(response.body);
 
-    final linkTags = document.querySelectorAll('link[rel="icon"]');
+    final linkTags = document.querySelectorAll('link[rel*="icon"]');
     var iconHref = linkTags.isNotEmpty ? linkTags[0].attributes['href'] : '';
     if ((iconHref?.startsWith('/') ?? false)) {
       iconHref = 'https://' + uri.host + iconHref!;
@@ -87,7 +90,7 @@ class Article {
     // 去掉 video 标签
     content = content.replaceAll(RegExp(r'<video[^>]*>.*?</video>'), '');
 
-    print('article $content');
+    print('article content loaded');
 
     print('\n');
     print('uri $uri, host ${uri.host}');
@@ -201,15 +204,6 @@ class Article {
       }
     });
 
-    content = content.replaceAllMapped(
-      RegExp(r'src="([^"]*)"'),
-      (match) {
-        String encodedUrl = match.group(1) ?? '';
-        String decodedUrl = Uri.decodeFull(encodedUrl);
-        return 'src="$decodedUrl"';
-      },
-    );
-
     final uuid = Uuid().v4();
 
     return Article(
@@ -217,7 +211,9 @@ class Article {
   }
 
   static Future<void> addArticle(String url) async {
+    print('before parse');
     final article = await parseArticle(url);
+    print('after parse');
     final articles = await getArticles();
     articles.add(article);
     await _writeArticles(articles);
