@@ -162,7 +162,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Read App'),
+        title: Text('EukoRead'),
       ),
       body: Column(
         children: [
