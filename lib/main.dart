@@ -6,6 +6,7 @@ import 'article.dart';
 import 'article_details.dart';
 import 'platform_channel.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter/cupertino.dart';
 
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_html/style.dart';
@@ -85,35 +86,38 @@ class _HomePageState extends State<HomePage> {
               ? _buildImage(_articles[index].icon!)
               : null,
           title: Text(_articles[index].title),
-          trailing: IconButton(
-            icon: Icon(Icons.delete),
-            onPressed: () {
+          trailing: GestureDetector(
+            onTap: () {
               showDialog(
                 context: context,
                 builder: (context) {
-                  return AlertDialog(
+                  return CupertinoAlertDialog(
                     title: Text('确认删除该文章？'),
                     actions: [
-                      TextButton(
+                      CupertinoDialogAction(
+                        child: Text('取消'),
                         onPressed: () {
                           Navigator.pop(context); // 关闭对话框
                         },
-                        child: Text('取消'),
                       ),
-                      TextButton(
+                      CupertinoDialogAction(
+                        child: Text('确认'),
                         onPressed: () async {
                           // 调用删除方法
                           await Article.deleteArticle(_articles[index].uuid);
                           _getArticles();
                           Navigator.pop(context); // 关闭对话框
                         },
-                        child: Text('确认'),
                       ),
                     ],
                   );
                 },
               );
             },
+            child: Icon(
+              CupertinoIcons.delete,
+              color: CupertinoColors.destructiveRed,
+            ),
           ),
 
           onTap: () {
@@ -129,10 +133,28 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  // Widget _buildFloatingActionButton(BuildContext context) {
+  //   return FloatingActionButton(
+  //     onPressed: () => _showUrlInputDialog(context),
+  //     child: Icon(Icons.add),
+  //   );
+  // }
+
   Widget _buildFloatingActionButton(BuildContext context) {
-    return FloatingActionButton(
-      onPressed: () => _showUrlInputDialog(context),
-      child: Icon(Icons.add),
+    return Container(
+      width: 56.0,
+      height: 56.0,
+      child: FloatingActionButton(
+        onPressed: () => _showUrlInputDialog(context),
+        child: Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
+        backgroundColor: Colors.blue,
+        tooltip: 'Add',
+        elevation: 3.0,
+        highlightElevation: 0.0,
+      ),
     );
   }
 
@@ -158,38 +180,33 @@ class _HomePageState extends State<HomePage> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return Center(
-          child: Card(
-            margin: EdgeInsets.all(16.0),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: _urlController,
-                    decoration: InputDecoration(
-                      labelText: '请输入URL',
-                      hintText: 'https://example.com',
-                    ),
-                  ),
-                  SizedBox(height: 16.0),
-                  ElevatedButton(
-                    onPressed: () {
-                      // 处理输入逻辑
-                      final String url = _urlController.text;
-                      if (url.isNotEmpty) {
-                        // 处理URL
-                        _addArticle(url);
-                      }
-                      Navigator.pop(context); // 关闭对话框
-                    },
-                    child: Text('确定'),
-                  ),
-                ],
-              ),
+        return CupertinoAlertDialog(
+          title: Text('请输入URL'),
+          content: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: CupertinoTextField(
+              controller: _urlController,
+              placeholder: 'https://example.com',
             ),
           ),
+          actions: [
+            CupertinoDialogAction(
+              child: Text('取消'),
+              onPressed: () {
+                Navigator.pop(context); // 关闭对话框
+              },
+            ),
+            CupertinoDialogAction(
+              child: Text('确定'),
+              onPressed: () {
+                final String url = _urlController.text;
+                if (url.isNotEmpty) {
+                  _addArticle(url);
+                }
+                Navigator.pop(context); // 关闭对话框
+              },
+            ),
+          ],
         );
       },
     );
