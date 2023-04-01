@@ -38,6 +38,8 @@ dependencies:
   cupertino_icons: ^1.0.2
   path_provider: ^2.0.14
   desktop_window: ^0.4.0
+  flutter_cache_manager: ^3.3.0
+  
 
 dev_dependencies:
   flutter_test:
@@ -55,6 +57,7 @@ dev_dependencies:
   http: ^0.13.3
   flutter_svg: ^0.23.0
   html_unescape: ^2.0.0
+  flutter_launcher_icons: ^0.9.2
   
 
 # For information on the generic Dart part of this file, see the
@@ -62,7 +65,8 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
+  assets:
+    - assets/
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -98,3 +102,12 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+flutter_icons: # This should be at the same level as 'dependencies' and 'flutter'
+  image_path: "assets/EuKoRead.png"
+  android: true
+  ios: true
+  macos: true
+
+
+

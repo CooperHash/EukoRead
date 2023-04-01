@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
 import 'package:html_unescape/html_unescape.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 class Article {
   final String uuid;
@@ -77,7 +78,7 @@ class Article {
     final uri = Uri.parse(url);
     final response = await http.get(Uri.parse(url));
     final document = parse(response.body);
-
+    print('document ${document.outerHtml}}');
     final linkTags = document.querySelectorAll('link[rel*="icon"]');
     var iconHref = linkTags.isNotEmpty ? linkTags[0].attributes['href'] : '';
     if ((iconHref?.startsWith('/') ?? false)) {
@@ -85,8 +86,34 @@ class Article {
     }
 
     final article = document.querySelector('article');
-    final title = document.querySelector('title')?.text ?? '';
-    var content = document.querySelector('article')?.outerHtml ?? '';
+
+    var content = '';
+    var title = '';
+    // 判断文章来源网站
+    if (Uri.parse(url).host == 'mp.weixin.qq.com') {
+      // 获取微信公众号文章正文
+      content = document.getElementById('page-content')?.outerHtml ?? '';
+      title = document.getElementById('activity-name')?.text ?? '';
+    } else if (Uri.parse(url).host == 'www.zhihu.com') {
+      // 获取知乎文章正文
+      content = document.querySelector('div.RichText')?.outerHtml ?? '';
+      title = document.querySelector('h1.QuestionHeader-title')?.text ?? '';
+    } else if (Uri.parse(url).host == 'xiaohongshu.com') {
+      content = document
+              .querySelector('meta[name="description"]')
+              ?.attributes['content'] ??
+          '';
+      title = document
+              .querySelector('meta[property="og:title"]')
+              ?.attributes['content'] ??
+          '';
+      print('content $content');
+    } else {
+      // 获取普通网站文章正文
+      content = document.querySelector('article')?.outerHtml ?? '';
+      title = document.querySelector('title')?.text ?? '';
+    }
+
     // 去掉 video 标签
     content = content.replaceAll(RegExp(r'<video[^>]*>.*?</video>'), '');
 
@@ -115,9 +142,7 @@ class Article {
     print(imgTags);
 
     for (final imgTag in imgTags) {
-      var tail = 1;
       var src = imgTag.attributes['src'];
-      var oldsrc = imgTag.attributes['src'];
       if (src == null) continue;
       if (src.startsWith('/') ||
           (src.contains(',') && uri.host == 'www.nytimes.com')) {
@@ -138,22 +163,12 @@ class Article {
           src += '.jpg';
         }
 
-        final response = await http.get(Uri.parse(src));
-        final bytes = response.bodyBytes;
-
-        final fileName = '${DateTime.now().millisecondsSinceEpoch}_image.jpg';
-        // final fileName = _getFileName1(src);
-
-        // 下载图片并保存到本地
-
-        final file = File(fileName);
-        await file.writeAsBytes(bytes);
-        if (await file.exists()) {
-          print('Download successful');
-        } else {
-          print('Download failed');
+        try {
+          final file = await DefaultCacheManager().getSingleFile(src);
+          print('Cache successful: ${file.path}');
+        } catch (e) {
+          print('Cache failed: $e');
         }
-        print('\n');
       } else if (src.startsWith('http') || src.startsWith('https')) {
         print('src $src');
         if (!src.endsWith('.jpg') &&
@@ -164,18 +179,12 @@ class Article {
             !src.endsWith('.awebp?')) {
           src += '.jpg';
         }
-        // 下载图片并保存到本地
-        final response = await http.get(Uri.parse(src));
-        final bytes = response.bodyBytes;
-        final fileName = _getFileName2(src);
-        final file = File('$fileName');
-        await file.writeAsBytes(bytes);
-        if (await file.exists()) {
-          print('Download successful');
-        } else {
-          print('Download failed');
+        try {
+          final file = await DefaultCacheManager().getSingleFile(src);
+          print('Cache successful: ${file.path}');
+        } catch (e) {
+          print('Cache failed: $e');
         }
-        print('\n');
       }
     }
 

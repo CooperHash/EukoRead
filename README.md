@@ -2,7 +2,7 @@
 
 Discover a world of simplicity with EukoRead.
 
-![](https://raw.githubusercontent.com/CooperHash/ImageBase/master/readapp-main-show.jpg?token=GHSAT0AAAAAABYZWSWHDBMJIPHBDLQI6LYSZBAHBRQ)
+![](https://github.com/CooperHash/ImageBase/blob/master/EuKoRead.jpg?raw=true)
 
 ## Getting Started
 

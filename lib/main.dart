@@ -28,7 +28,7 @@ class ReadApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Read App',
+      title: 'EukoRead',
       home: HomePage(),
     );
   }
@@ -60,18 +60,32 @@ class _HomePageState extends State<HomePage> {
     _getArticles();
   }
 
-  Widget? _buildImage(String url) {
-    if (url.toLowerCase().endsWith('.svg')) {
-      return SvgPicture.network(
-        url,
-        width: 24,
-        height: 24,
-      );
-    } else {
-      return Image.network(
-        url,
-        width: 24,
-        height: 24,
+  Widget _buildImage(String url) {
+    try {
+      if (url.toLowerCase().endsWith('.svg')) {
+        return SvgPicture.network(
+          url,
+          width: 24,
+          height: 24,
+        );
+      } else {
+        return Image.network(
+          url,
+          width: 24,
+          height: 24,
+          errorBuilder: (context, error, stackTrace) {
+            return Icon(
+              CupertinoIcons.news,
+              size: 24,
+            );
+          },
+        );
+      }
+    } catch (e) {
+      print('Error loading image: $e');
+      return Icon(
+        CupertinoIcons.news,
+        size: 24,
       );
     }
   }
@@ -81,51 +95,43 @@ class _HomePageState extends State<HomePage> {
       itemCount: _articles.length,
       itemBuilder: (context, index) {
         return ListTile(
-          // 在 ListView.builder 的 itemBuilder 中使用：
           leading: _articles[index].icon != null
               ? _buildImage(_articles[index].icon!)
               : null,
           title: Text(_articles[index].title),
-          trailing: GestureDetector(
-            onTap: () {
-              showDialog(
-                context: context,
-                builder: (context) {
-                  return CupertinoAlertDialog(
-                    title: Text('确认删除该文章？'),
-                    actions: [
-                      CupertinoDialogAction(
-                        child: Text('取消'),
-                        onPressed: () {
-                          Navigator.pop(context); // 关闭对话框
-                        },
-                      ),
-                      CupertinoDialogAction(
-                        child: Text('确认'),
-                        onPressed: () async {
-                          // 调用删除方法
-                          await Article.deleteArticle(_articles[index].uuid);
-                          _getArticles();
-                          Navigator.pop(context); // 关闭对话框
-                        },
-                      ),
-                    ],
-                  );
-                },
-              );
-            },
-            child: Icon(
-              CupertinoIcons.delete,
-              color: CupertinoColors.destructiveRed,
-            ),
-          ),
-
           onTap: () {
             Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => ArticleDetails(article: _articles[index]),
               ),
+            );
+          },
+          onLongPress: () {
+            showDialog(
+              context: context,
+              builder: (context) {
+                return CupertinoAlertDialog(
+                  title: Text('确认删除该文章？'),
+                  actions: [
+                    CupertinoDialogAction(
+                      child: Text('取消'),
+                      onPressed: () {
+                        Navigator.pop(context); // 关闭对话框
+                      },
+                    ),
+                    CupertinoDialogAction(
+                      child: Text('确认'),
+                      onPressed: () async {
+                        // 调用删除方法
+                        await Article.deleteArticle(_articles[index].uuid);
+                        _getArticles();
+                        Navigator.pop(context); // 关闭对话框
+                      },
+                    ),
+                  ],
+                );
+              },
             );
           },
         );

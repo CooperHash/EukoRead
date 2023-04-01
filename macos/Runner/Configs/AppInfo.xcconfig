@@ -7,6 +7,9 @@
 // The application's name. By default this is also the title of the Flutter window.
 PRODUCT_NAME = read
 
+ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+
+
 // The application's bundle identifier
 PRODUCT_BUNDLE_IDENTIFIER = com.example.read
 
