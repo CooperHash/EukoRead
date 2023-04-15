@@ -41,6 +41,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<Article> _articles = [];
+  Article? _selectedArticle;
 
   @override
   void initState() {
@@ -100,12 +101,9 @@ class _HomePageState extends State<HomePage> {
               : null,
           title: Text(_articles[index].title),
           onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ArticleDetails(article: _articles[index]),
-              ),
-            );
+            setState(() {
+              _selectedArticle = _articles[index];
+            });
           },
           onLongPress: () {
             showDialog(
@@ -139,12 +137,51 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // Widget _buildFloatingActionButton(BuildContext context) {
-  //   return FloatingActionButton(
-  //     onPressed: () => _showUrlInputDialog(context),
-  //     child: Icon(Icons.add),
-  //   );
-  // }
+  Widget _buildContent() {
+    if (_selectedArticle == null) {
+      return Center(child: Text('请选择文章'));
+    }
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: SingleChildScrollView(
+        child: Html(
+          data: _selectedArticle!.content.replaceAll('\n', '<br>'),
+          style: {
+            "body": Style(margin: EdgeInsets.all(8.0)),
+            "h2": Style(fontSize: FontSize(26)),
+            "h4": Style(fontSize: FontSize(22)),
+            "p": Style(
+              fontSize: FontSize(22),
+              padding: EdgeInsets.only(bottom: 8.0),
+            ),
+          },
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('My Articles'),
+      ),
+      body: Row(
+        children: [
+          Expanded(
+            flex: 1,
+            child: _buildList(),
+          ),
+          Expanded(
+            flex: 2,
+            child: _buildContent(),
+          ),
+        ],
+      ),
+      floatingActionButton: _buildFloatingActionButton(context),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+    );
+  }
 
   Widget _buildFloatingActionButton(BuildContext context) {
     return Container(
@@ -164,23 +201,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('EukoRead'),
-      ),
-      body: Column(
-        children: [
-          Expanded(child: _buildList()),
-        ],
-      ),
-      floatingActionButton: _buildFloatingActionButton(context),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-    );
-  }
-
-  // 显示输入框
+// 显示输入框
   void _showUrlInputDialog(BuildContext context) {
     final TextEditingController _urlController = TextEditingController();
     showDialog(
@@ -218,3 +239,14 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+
+
+
+// Widget _buildFloatingActionButton(BuildContext context) {
+//   return FloatingActionButton(
+//     onPressed: () => _showUrlInputDialog(context),
+//     child: Icon(Icons.add),
+//   );
+// }
+
+

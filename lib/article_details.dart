@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_html/style.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'article.dart';
 
@@ -44,6 +45,7 @@ class _ArticleDetailsState extends State<ArticleDetails> {
               "p": Style(
                   fontSize: FontSize(22),
                   padding: EdgeInsets.only(bottom: 8.0)),
+              "img": Style(width: MediaQuery.of(context).size.width * 0.8),
             },
           )),
     ));
